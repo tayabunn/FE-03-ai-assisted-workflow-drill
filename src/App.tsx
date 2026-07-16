@@ -1,122 +1,136 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { useState } from 'react';
+import { creatorSettingsSchema } from './schema';
+import './App.css';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [payoutEmail, setPayoutEmail] = useState('');
+  const [bio, setBio] = useState('');
+  const [theme, setTheme] = useState<'light' | 'dark'>('light');
+  const [newsletter, setNewsletter] = useState(false);
+  
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [success, setSuccess] = useState(false);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    const result = creatorSettingsSchema.safeParse({
+      username,
+      email,
+      payoutEmail,
+      bio,
+      theme,
+      newsletter,
+    });
+
+    if (!result.success) {
+      const fieldErrors: Record<string, string> = {};
+      result.error.issues.forEach((issue) => {
+        const path = issue.path[0] as string;
+        if (path) {
+          fieldErrors[path] = issue.message;
+        }
+      });
+      setErrors(fieldErrors);
+      setSuccess(false);
+    } else {
+      setErrors({});
+      setSuccess(true);
+      console.log('Saved settings:', result.data);
+    }
+  };
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
+    <div style={{ maxWidth: '400px', margin: '40px auto', padding: '20px', border: '1px solid #ccc', borderRadius: '8px' }}>
+      <h2>Settings (Round 2)</h2>
+      {success && <div style={{ color: 'green', marginBottom: '10px' }}>Settings saved successfully!</div>}
+      <form onSubmit={handleSubmit} noValidate>
+        <div style={{ marginBottom: '15px' }}>
+          <label style={{ display: 'block', marginBottom: '5px' }}>Username:</label>
+          <input
+            type="text"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            style={{ width: '100%', padding: '8px', boxSizing: 'border-box' }}
+          />
+          {errors.username && <span style={{ color: 'red', fontSize: '12px' }}>{errors.username}</span>}
         </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
+        
+        <div style={{ marginBottom: '15px' }}>
+          <label style={{ display: 'block', marginBottom: '5px' }}>Email:</label>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            style={{ width: '100%', padding: '8px', boxSizing: 'border-box' }}
+          />
+          {errors.email && <span style={{ color: 'red', fontSize: '12px' }}>{errors.email}</span>}
         </div>
+
+        <div style={{ marginBottom: '15px' }}>
+          <label style={{ display: 'block', marginBottom: '5px' }}>Payout Email:</label>
+          <input
+            type="email"
+            value={payoutEmail}
+            onChange={(e) => setPayoutEmail(e.target.value)}
+            style={{ width: '100%', padding: '8px', boxSizing: 'border-box' }}
+          />
+          {errors.payoutEmail && <span style={{ color: 'red', fontSize: '12px' }}>{errors.payoutEmail}</span>}
+        </div>
+
+        <div style={{ marginBottom: '15px' }}>
+          <label style={{ display: 'block', marginBottom: '5px' }}>Bio:</label>
+          <textarea
+            value={bio}
+            onChange={(e) => setBio(e.target.value)}
+            style={{ width: '100%', padding: '8px', boxSizing: 'border-box' }}
+          />
+          {errors.bio && <span style={{ color: 'red', fontSize: '12px' }}>{errors.bio}</span>}
+        </div>
+
+        <div style={{ marginBottom: '15px' }}>
+          <label style={{ display: 'block', marginBottom: '5px' }}>Theme:</label>
+          <select
+            value={theme}
+            onChange={(e) => setTheme(e.target.value as 'light' | 'dark')}
+            style={{ width: '100%', padding: '8px', boxSizing: 'border-box' }}
+          >
+            <option value="light">Light</option>
+            <option value="dark">Dark</option>
+          </select>
+          {errors.theme && <span style={{ color: 'red', fontSize: '12px' }}>{errors.theme}</span>}
+        </div>
+
+        <div style={{ marginBottom: '15px' }}>
+          <label>
+            <input
+              type="checkbox"
+              checked={newsletter}
+              onChange={(e) => setNewsletter(e.target.checked)}
+            />{' '}
+            Subscribe to newsletter
+          </label>
+          {errors.newsletter && <span style={{ color: 'red', fontSize: '12px' }}>{errors.newsletter}</span>}
+        </div>
+
         <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
+          type="submit"
+          style={{
+            padding: '10px 15px',
+            backgroundColor: '#007bff',
+            color: '#fff',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer',
+          }}
         >
-          Count is {count}
+          Save Settings
         </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+      </form>
+    </div>
+  );
 }
 
-export default App
+export default App;
