@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
-// Deliberate bug: missing '+' in the character class for the local part, which blocks aliases like user+alias@domain.com
-export const PAYOUT_EMAIL_REGEX = /^[a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+// Fixed bug: added '+' to the character class for the local part, enabling aliases like user+alias@domain.com
+export const PAYOUT_EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
 export const creatorSettingsSchema = z.object({
   username: z
