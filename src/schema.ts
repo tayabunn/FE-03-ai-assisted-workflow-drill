@@ -25,9 +25,7 @@ export const creatorSettingsSchema = z.object({
     .max(100, { message: 'Bio must be under 100 characters' })
     .optional()
     .or(z.literal('')),
-  theme: z.enum(['light', 'dark'], {
-    errorMap: () => ({ message: 'Please select a valid theme' }),
-  }),
+  theme: z.enum(['light', 'dark']),
   newsletter: z.boolean(),
 });
 
